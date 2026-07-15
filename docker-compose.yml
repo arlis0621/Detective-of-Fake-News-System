@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    command: sh -c "streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port 8501 --server.headless true --browser.gatherUsageStats false"
+    ports:
+      - "8501:8501"
+    environment:
+      DJANGO_DEBUG: "1"
+      PLATFORM_BRAND_NAME: "News Trust Platform"
+    volumes:
+      - .:/app
+
+  worker:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py process_jobs --poll-interval 2 --worker-name demo-worker"
+    environment:
+      DJANGO_DEBUG: "1"
+    volumes:
+      - .:/app

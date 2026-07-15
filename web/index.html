@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" data-api-base="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>News Trust Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/platform.css?v=11" />
+</head>
+<body>
+  <div id="asset-load-err" class="asset-fail-banner" hidden>
+    Could not load <code>assets/platform.js</code>. Serve this page from the Django app and confirm the server is running.
+  </div>
+  <div id="sticky-status" class="sticky-status is-hidden" aria-live="polite"></div>
+
+  <main class="app-shell-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <a href="#" class="brand" id="brand-logo">News Trust <span>Platform</span></a>
+        <p class="brand-tag" id="hero-brand-line">Detection management workspace</p>
+      </div>
+      <div class="nav-section">Workspace</div>
+      <section class="workspace-tabs" aria-label="Main workspace sections">
+        <button class="tab-btn is-active" type="button" data-workspace-tab="analyze">Analyze</button>
+        <button class="tab-btn" type="button" data-workspace-tab="queue">Queue jobs</button>
+        <button class="tab-btn" type="button" data-workspace-tab="cases">Cases</button>
+        <button class="tab-btn" type="button" data-workspace-tab="summary">Summary</button>
+      </section>
+      <div class="nav-section">External</div>
+      <nav class="top-actions">
+        <a href="/openapi.json" target="_blank" rel="noopener">API schema</a>
+        <a href="?demo=1" id="quick-demo-link">Run demo</a>
+      </nav>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <h1>Risk dashboard</h1>
+          <p>Analyze articles, queue processing, and triage editorial cases.</p>
+        </div>
+        <div class="topbar-badges">
+          <span class="badge badge-red" id="badge-high-risk">0 high risk</span>
+          <span class="badge badge-amber" id="badge-pending-review">0 pending review</span>
+          <span class="badge badge-green">System live</span>
+        </div>
+      </header>
+
+      <section class="workspace-panel is-active" data-tab-panel="analyze">
+      <div class="workspace-grid">
+        <aside class="card form-card">
+          <h2>Article input</h2>
+          <p class="helper">Start with a quick sample or enter your own article details.</p>
+          <form id="analyze-form" action="#" onsubmit="return false;">
+            <div class="mode-toggle">
+              <label><input type="radio" name="mode" value="paste" checked /> Paste text</label>
+              <label><input type="radio" name="mode" value="url" /> Fetch from URL</label>
+            </div>
+
+            <div class="quick-row">
+              <button type="button" class="btn btn-soft" id="btn-load-sample">Quick start: sample and run</button>
+              <button type="button" class="btn btn-soft" id="btn-load-sample-only">Load sample only</button>
+            </div>
+
+            <div id="paste-fields">
+              <div class="field">
+                <label for="title">Title (optional)</label>
+                <input id="title" name="title" type="text" placeholder="Example: City council approves transit plan" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="article-body">Article body</label>
+                <textarea id="article-body" name="body" rows="7" placeholder="Paste article text for analysis"></textarea>
+                <p class="field-hint">Tip: Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (or <kbd>Cmd</kbd>+<kbd>Enter</kbd>) to run quickly.</p>
+              </div>
+            </div>
+
+            <div id="url-fields" hidden>
+              <div class="field">
+                <label for="url">Article URL</label>
+                <input id="url" name="url" type="url" placeholder="https://example.com/news-story" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="backend">Model backend</label>
+              <select id="backend" name="backend">
+                <option value="classical">Classical (TF-IDF + Logistic Regression)</option>
+                <option value="bilstm">Keras BiLSTM (if trained)</option>
+                <option value="mini_transformer">Keras mini transformer (if trained)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="apiKey">API key (optional)</label>
+              <input id="apiKey" name="apiKey" type="password" autocomplete="off" placeholder="Only needed when server requires X-API-Key" />
+            </div>
+            <div class="field field-checkbox">
+              <label class="checkbox-label">
+                <input type="checkbox" id="chk-keyword-insight" name="keywordInsight" />
+                Include full classical keyword insight
+              </label>
+              <p class="field-hint">Uses the existing insight API path and returns additional explainability details.</p>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-analyze">Run analysis</button>
+            <div class="err" id="analyze-err" hidden></div>
+          </form>
+        </aside>
+
+        <section class="card results-card" id="results-panel">
+          <div class="results-head">
+            <h2 id="analysis-results">Analysis results</h2>
+            <p id="analyze-status" class="analyze-status" aria-live="polite" hidden></p>
+          </div>
+          <div id="results-placeholder" class="empty-state">
+            <p>No analysis yet.</p>
+            <small>Run analysis from the left panel to see scores, summary, and signals.</small>
+          </div>
+          <div id="results-content" hidden>
+            <div id="insight-panel" class="insight-panel" hidden></div>
+            <div class="summary-box" id="summary-box" hidden>
+              <h3>Article summary</h3>
+              <p id="summary-text"></p>
+            </div>
+            <div class="rings" id="rings"></div>
+            <h3 class="signals-heading">Signal breakdown</h3>
+            <div class="signal-cards" id="signal-cards"></div>
+            <div class="disclaimer" id="product-framing"></div>
+          </div>
+        </section>
+      </div>
+      </section>
+
+      <section class="workspace-panel" data-tab-panel="queue">
+        <div class="card">
+        <h2>Queue jobs</h2>
+        <p class="helper">Submit jobs for asynchronous processing. If workers are slow, you can still use Run now.</p>
+        <form id="queue-form" action="#" onsubmit="return false;">
+          <div class="split-grid">
+            <div class="field">
+              <label for="queue-org-id">Organization ID</label>
+              <input id="queue-org-id" type="text" value="demo-org" />
+            </div>
+            <div class="field">
+              <label for="queue-backend">Backend</label>
+              <select id="queue-backend">
+                <option value="classical">Classical (TF-IDF + Logistic Regression)</option>
+                <option value="bilstm">Keras BiLSTM (if trained)</option>
+                <option value="mini_transformer">Keras mini transformer (if trained)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="queue-title">Title</label>
+              <input id="queue-title" type="text" placeholder="Queue job title" />
+            </div>
+            <div class="field">
+              <label for="queue-url">Article URL (optional)</label>
+              <input id="queue-url" type="url" placeholder="https://example.com/article" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="queue-body">Body</label>
+            <textarea id="queue-body" rows="4" placeholder="Paste article text for queued analysis"></textarea>
+          </div>
+          <div class="button-row">
+            <button id="queue-submit-btn" type="submit" class="btn btn-primary">Submit queue job</button>
+            <button id="queue-refresh-btn" type="button" class="btn btn-soft">Refresh queue</button>
+          </div>
+          <div class="button-row" id="queue-run-now-wrap" hidden>
+            <button id="queue-run-now-btn" type="button" class="btn btn-primary">Run now (sync)</button>
+            <p class="field-hint" id="queue-run-now-note">This queued job can be run immediately on the API server.</p>
+          </div>
+          <div class="err" id="queue-err" hidden></div>
+          <p class="field-hint" id="queue-last-job"></p>
+        </form>
+        <div id="queue-list" class="queue-list"></div>
+        </div>
+      </section>
+
+      <section class="workspace-panel" data-tab-panel="cases">
+        <div class="card">
+        <h2>Case management</h2>
+        <p class="helper">Create and update editorial cases. State and assignee changes are recorded by the backend.</p>
+        <form id="cases-form" action="#" onsubmit="return false;">
+          <div class="split-grid">
+            <div class="field">
+              <label for="cases-org-id">Organization ID</label>
+              <input id="cases-org-id" type="text" value="demo-org" />
+            </div>
+            <div class="field">
+              <label for="cases-title">Case title</label>
+              <input id="cases-title" type="text" placeholder="Potential misinformation claim" />
+            </div>
+            <div class="field">
+              <label for="cases-assignee">Assignee</label>
+              <input id="cases-assignee" type="text" placeholder="editor@desk" />
+            </div>
+            <div class="field">
+              <label for="cases-severity">Severity (0-1)</label>
+              <input id="cases-severity" type="number" min="0" max="1" step="0.01" value="0.7" />
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="cases-create-btn" type="submit" class="btn btn-primary">Create case</button>
+            <button id="cases-create-from-input-btn" type="button" class="btn btn-soft">Create from current input</button>
+            <button id="cases-refresh-btn" type="button" class="btn btn-soft">Refresh cases</button>
+          </div>
+          <div class="err" id="cases-err" hidden></div>
+        </form>
+        <div id="cases-list" class="queue-list"></div>
+        </div>
+      </section>
+
+      <section class="workspace-panel" data-tab-panel="summary">
+        <div class="summary-grid">
+          <article class="card metric-card">
+            <h3>Latest analysis state</h3>
+            <p id="summary-latest-analysis">No analysis run in this session.</p>
+          </article>
+          <article class="card metric-card">
+            <h3>Queue monitor</h3>
+            <p id="summary-queue-health">Queue status will appear after refresh or submit.</p>
+          </article>
+          <article class="card metric-card">
+            <h3>Cases monitor</h3>
+            <p id="summary-cases-health">Case counts appear after loading cases.</p>
+          </article>
+        </div>
+        <div class="card">
+          <h3>API quick reference</h3>
+          <pre class="code" id="curl-paste"></pre>
+          <pre class="code" id="curl-url"></pre>
+          <pre class="code" id="curl-usage"></pre>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer-site">
+    <span id="footer-brand">News Trust Platform</span> - Scores are assistive signals, not final editorial verdicts.
+  </footer>
+
+  <script
+    src="assets/platform.js?v=11"
+    defer
+    onerror="document.getElementById('asset-load-err').hidden=false"
+  ></script>
+</body>
+</html>
