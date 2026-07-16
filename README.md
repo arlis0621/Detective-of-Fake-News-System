@@ -281,13 +281,7 @@ This repository is **open source** under the [MIT License](LICENSE). Stars, issu
 
 ### Project docs for contributors
 
-| Topic | Document |
-|-------|----------|
-| Full OSS inventory (CI/CD, security, community) | [docs/OPEN_SOURCE.md](docs/OPEN_SOURCE.md) |
-| How to contribute | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| Security policy | [SECURITY.md](SECURITY.md) |
-| Compliance and data governance | [docs/COMPLIANCE.md](docs/COMPLIANCE.md) |
-| Code of conduct | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
+
 
 ### How you can help
 
@@ -296,11 +290,6 @@ This repository is **open source** under the [MIT License](LICENSE). Stars, issu
 - **Submit a pull request** with a focused change and a clear description.
 - **Share** the project with students, journalists, or teams building trust-and-safety tooling.
 
-Maintained by [Akhil Vydyula](https://github.com/akhilvydyula) as part of the Skills Marathon ML portfolio.
-
-## License and ethics
-
-Application code is released under the [MIT License](LICENSE).
 
 - Verify dataset and model licenses before production use.
 - Disclose automated scoring to users or moderators where required.
