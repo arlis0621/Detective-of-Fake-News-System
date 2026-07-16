@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/akhilvydyula/fake-news-detection/blob/main/SECURITY.md
+    url: https://github.com/arlis0621/Detective-of-Fake-News-System/blob/main/SECURITY.md
     about: Report security issues privately
   - name: Discussions (Q and A)
-    url: https://github.com/akhilvydyula/fake-news-detection/discussions
+    url: https://github.com/arlis0621/Detective-of-Fake-News-System/discussions
     about: Ask questions and share ideas
